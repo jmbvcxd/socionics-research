@@ -1,8 +1,0 @@
-__pycache__/
-*.pyc
-.env
-venv/
-notebooks/.ipynb_checkpoints/
-.DS_Store
-.idea/
-.vscode/
