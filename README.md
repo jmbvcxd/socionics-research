@@ -1,12 +1,2 @@
 # socionics-research
-__pycache__/
-*.pyc
-.env
-venv/
-notebooks/.ipynb_checkpoints/
-.DS_Store
-.idea/
-.vscode/
-*.egg-info/
-dist/
-build/
+This is a repository for a data scraper, to be used for a HEXACO and socionics-based chat bot (for user and self-modeling).
