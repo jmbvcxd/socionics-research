@@ -30,7 +30,9 @@ This repository provides a Python-based platform for collecting, analyzing, and 
 
 2. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
+   pip install -e .  # Editable install (recommended)
+   # or
+   pip install -r requirements.txt  # Direct install
    ```
 
 3. **Run tests:**

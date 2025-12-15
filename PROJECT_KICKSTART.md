@@ -44,8 +44,15 @@ The project follows a standard Python package layout:
    ```
 
 2. **Install dependencies:**
+   
+   Option A - Regular install:
    ```bash
    pip install -r requirements.txt
+   ```
+   
+   Option B - Editable install (recommended for development):
+   ```bash
+   pip install -e .
    ```
 
 3. **Run tests:**

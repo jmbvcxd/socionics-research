@@ -4,7 +4,7 @@ This module implements utilities for computing KL divergence between
 token distributions from different LLM runs.
 """
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import numpy as np
 from scipy.stats import entropy
 
@@ -41,7 +41,7 @@ def normalize_distribution(
 
 def align_distributions(
     p_dist: Dict[str, float], q_dist: Dict[str, float], epsilon: float = 1e-10
-) -> tuple[np.ndarray, np.ndarray]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """Align two distributions over the same vocabulary.
 
     Args:
