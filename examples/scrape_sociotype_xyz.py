@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from socionics_research.database import init_database, get_connection  # noqa: E402
 from socionics_research.pipeline import (  # noqa: E402
     SociotypeXyzScraper,
-    scrape_and_import_celebrities,
+    scrape_with_fallback,
 )
 
 
@@ -31,9 +31,9 @@ def main():
     print("Scraping Celebrity Data from sociotype.xyz")
     print("=" * 80)
 
-    # Option 1: Use the convenience function
-    print("\nOption 1: Using convenience function")
-    count = scrape_and_import_celebrities(db_path, limit=50)
+    # Option 1: Use the fallback scraper (tries HTTP first, then Playwright)
+    print("\nOption 1: Using fallback scraper (HTTP → Playwright)")
+    count = scrape_with_fallback(db_path, limit=50)
     print(f"\nSuccessfully imported {count} celebrities")
 
     # Option 2: Use the scraper directly for more control

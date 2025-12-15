@@ -15,7 +15,10 @@
 
 ### Data Pipeline
 
-1. **Scraping Module**: Collects public figure data respecting robots.txt
+1. **Scraping Module**: Collects public figure data with intelligent fallback
+   - HTTP scraper for static content (fast, efficient)
+   - Playwright scraper for JavaScript-rendered content (fallback)
+   - Automatic retry logic when data not found
 2. **Rewriting Module**: Summarizes and normalizes collected text
 3. **Indexing Module**: Builds vector index for RAG capabilities
 4. **LLM Orchestration**: Manages prompt execution across multiple models
@@ -32,11 +35,13 @@
 ## Data Flow
 
 ```
-Public Sources
+Public Sources (sociotype.xyz, etc.)
     ↓
-Scraping & Rewriting
+Scraping (HTTP → Playwright fallback)
     ↓
-DuckDB Storage
+Data Extraction & Normalization
+    ↓
+DuckDB Storage (sources, personalities, labels)
     ↓
 LLM Prompts → [Model A, Model B]
     ↓
@@ -48,6 +53,23 @@ Sparse Autoencoder
     ↓
 NeuronPedia Labels
 ```
+
+## Scraping Architecture
+
+The scraping system uses a two-tier approach:
+
+1. **HTTP Scraper (Primary)**
+   - Fast and lightweight
+   - Uses requests + BeautifulSoup
+   - Works for static content
+   - Minimal resource usage
+
+2. **Playwright Scraper (Fallback)**
+   - Handles JavaScript-rendered content
+   - Full browser automation
+   - Used when HTTP scraper fails or returns no data
+   - Can perform searches and navigation
+   - Takes screenshots for debugging
 
 ## Technology Stack
 

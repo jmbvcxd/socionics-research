@@ -33,6 +33,7 @@ Initializes a new DuckDB database with all required tables:
 ### `scrape_sociotype_xyz.py`
 **NEW** - Scrapes celebrity personality data from sociotype.xyz:
 - Automatically fetches notable figures and their socionics types
+- **Uses intelligent fallback: HTTP first, then Playwright for dynamic content**
 - Imports data directly into the database
 - Includes confidence scores when available
 - Respects rate limits and includes proper error handling
@@ -44,6 +45,20 @@ python examples/scrape_sociotype_xyz.py
 ```
 
 This populates the database with real personality type assignments from the sociotype.xyz community database.
+
+### `search_person.py`
+**NEW** - Search for a specific person on sociotype.xyz:
+- Finds and imports data for a specific individual
+- Uses Playwright fallback when HTTP scraping fails
+- Displays imported personality data
+
+Usage:
+```bash
+python examples/search_person.py "Albert Einstein"
+python examples/search_person.py "Marie Curie" --db custom.duckdb
+```
+
+Perfect for finding data on a specific person when they're not in the initial scrape.
 
 ### `add_personality.py`
 Demonstrates how to:
