@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "socionics_research"
+version = "0.1.0"
+description = "Research platform for socionics personality analysis with ML/AI integration"
+authors = [{ name = "socionics-research contributors" }]
+dependencies = []
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
