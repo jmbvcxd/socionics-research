@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+notebooks/.ipynb_checkpoints/
+.DS_Store
+.idea/
+.vscode/
+*.db
+*.duckdb
+*.duckdb.wal
+dist/
+build/
+*.egg-info/
