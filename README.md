@@ -15,6 +15,7 @@ This repository provides a Python-based platform for collecting, analyzing, and 
 ## Features
 
 - 🔍 Collect and analyze public figure personality data
+- 🌐 **Automated scraping from sociotype.xyz** for celebrity type data
 - 🤖 Compare outputs from multiple LLMs
 - 📊 Token-level distribution capture and KL divergence computation
 - 🧠 Sparse autoencoder training for interpretability
@@ -40,7 +41,13 @@ This repository provides a Python-based platform for collecting, analyzing, and 
    pytest -q
    ```
 
-4. **Format and lint code:**
+4. **Initialize database and import data:**
+   ```bash
+   python examples/init_database.py
+   python examples/scrape_sociotype_xyz.py  # Import celebrity data
+   ```
+
+5. **Format and lint code:**
    ```bash
    black .
    flake8 .

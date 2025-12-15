@@ -30,9 +30,24 @@ Initializes a new DuckDB database with all required tables:
 - activation_vectors: Neural activation data
 - computed_vectors: Aggregated features for ML
 
+### `scrape_sociotype_xyz.py`
+**NEW** - Scrapes celebrity personality data from sociotype.xyz:
+- Automatically fetches notable figures and their socionics types
+- Imports data directly into the database
+- Includes confidence scores when available
+- Respects rate limits and includes proper error handling
+- Can scrape a limited number or full dataset
+
+Usage:
+```bash
+python examples/scrape_sociotype_xyz.py
+```
+
+This populates the database with real personality type assignments from the sociotype.xyz community database.
+
 ### `add_personality.py`
 Demonstrates how to:
-- Add personalities to the database
+- Add personalities to the database manually
 - Assign sociotype labels with confidence scores
 - List all personalities with their types
 - Work with the database programmatically
