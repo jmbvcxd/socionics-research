@@ -1,11 +1,6 @@
 """Tests for KL divergence computation."""
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))  # noqa: E402
-
-from socionics_research.analysis import (  # noqa: E402
+from socionics_research.analysis import (
     compute_kl_divergence,
     compute_sequence_kl,
 )

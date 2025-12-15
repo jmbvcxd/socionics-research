@@ -1,11 +1,6 @@
 """Tests for database module."""
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))  # noqa: E402
-
-from socionics_research.database import init_database, verify_schema  # noqa: E402
+from socionics_research.database import init_database, verify_schema
 
 
 def test_init_database():
