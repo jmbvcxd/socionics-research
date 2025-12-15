@@ -68,6 +68,7 @@ This repository provides a Python-based platform for collecting, analyzing, and 
 
 - **[Overview](docs/overview.md)**: Project goals and features
 - **[Architecture](docs/architecture.md)**: System design and components
+- **[Scraping Guide](docs/scraping_guide.md)**: How to collect personality data
 - **[Roadmap](docs/roadmap.md)**: Development plan and milestones
 - **[PROJECT_KICKSTART.md](PROJECT_KICKSTART.md)**: Setup and next steps
 
