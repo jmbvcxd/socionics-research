@@ -402,15 +402,22 @@ def scrape_with_fallback(
 
     # Try HTTP scraper first
     print("Attempting HTTP scraping...")
-    http_scraper = SociotypeXyzScraper()
+    try:
+        http_scraper = SociotypeXyzScraper()
+    except ImportError as e:
+        print(f"HTTP scraper not available: {e}")
+        http_scraper = None
 
-    if person_name:
-        celebrities = http_scraper.scrape_celebrities()
-        celebrities = [
-            c for c in celebrities if person_name.lower() in c["name"].lower()
-        ]
+    if http_scraper:
+        if person_name:
+            celebrities = http_scraper.scrape_celebrities()
+            celebrities = [
+                c for c in celebrities if person_name.lower() in c["name"].lower()
+            ]
+        else:
+            celebrities = http_scraper.scrape_celebrities(limit=limit)
     else:
-        celebrities = http_scraper.scrape_celebrities(limit=limit)
+        celebrities: List[Dict[str, Any]] = []
 
     # If HTTP scraping failed or found nothing, try Playwright
     if not celebrities:
@@ -424,6 +431,14 @@ def scrape_with_fallback(
                     celebrities = [result] if result else []
                 else:
                     celebrities = pw_scraper.scrape_celebrities(limit=limit)
+                if not celebrities:
+                    print("No celebrities found with either method.")
+                    return 0
+
+                conn = get_connection(db_path, read_only=False)
+                saved_count = pw_scraper.save_to_database(conn, celebrities)
+                conn.close()
+                return saved_count
         except ImportError as e:
             print(f"Playwright not available: {e}")
             return 0
@@ -431,19 +446,9 @@ def scrape_with_fallback(
             print(f"Playwright scraping error: {e}")
             return 0
 
-    if not celebrities:
-        print("No celebrities found with either method.")
-        return 0
-
-    # Save to database
+    # Save to database (HTTP path)
     conn = get_connection(db_path, read_only=False)
-
-    # Use appropriate scraper for saving
-    if person_name or not http_scraper:
-        with PlaywrightSociotypeScraper() as pw_scraper:
-            saved_count = pw_scraper.save_to_database(conn, celebrities)
-    else:
-        saved_count = http_scraper.save_to_database(conn, celebrities)
+    saved_count = http_scraper.save_to_database(conn, celebrities)
 
     conn.close()
     return saved_count
