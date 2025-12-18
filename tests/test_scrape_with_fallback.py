@@ -5,7 +5,9 @@ import pytest
 import socionics_research.pipeline.playwright_scraper as pw_module
 
 
-def test_scrape_with_fallback_uses_playwright_when_http_returns_none(monkeypatch, tmp_path):
+def test_scrape_with_fallback_uses_playwright_when_http_returns_none(
+    monkeypatch, tmp_path
+):
     """Ensure fallback path saves via Playwright scraper."""
 
     class DummyHttpScraper:
@@ -57,7 +59,9 @@ def test_scrape_with_fallback_uses_playwright_when_http_returns_none(monkeypatch
     )
 
     dummy_pw = DummyPlaywrightScraper()
-    monkeypatch.setattr(pw_module, "PlaywrightSociotypeScraper", lambda *args, **kwargs: dummy_pw)
+    monkeypatch.setattr(
+        pw_module, "PlaywrightSociotypeScraper", lambda *args, **kwargs: dummy_pw
+    )
 
     db_path = tmp_path / "fallback.duckdb"
     count = pw_module.scrape_with_fallback(str(db_path), limit=1)
