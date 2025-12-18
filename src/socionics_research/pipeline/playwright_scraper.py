@@ -400,6 +400,9 @@ def scrape_with_fallback(
     from ..database import get_connection
     from .sociotype_scraper import SociotypeXyzScraper
 
+    used_playwright = False
+    celebrities: List[Dict[str, Any]] = []
+
     # Try HTTP scraper first
     print("Attempting HTTP scraping...")
     http_scraper = SociotypeXyzScraper()
@@ -424,6 +427,7 @@ def scrape_with_fallback(
                     celebrities = [result] if result else []
                 else:
                     celebrities = pw_scraper.scrape_celebrities(limit=limit)
+                used_playwright = True
         except ImportError as e:
             print(f"Playwright not available: {e}")
             return 0
@@ -439,7 +443,7 @@ def scrape_with_fallback(
     conn = get_connection(db_path, read_only=False)
 
     # Use appropriate scraper for saving
-    if person_name or not http_scraper:
+    if used_playwright:
         with PlaywrightSociotypeScraper() as pw_scraper:
             saved_count = pw_scraper.save_to_database(conn, celebrities)
     else:
