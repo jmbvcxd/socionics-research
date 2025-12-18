@@ -7,6 +7,7 @@ robots.txt and tracking provenance.
 from datetime import datetime
 from typing import Optional, Dict, Any
 from urllib.parse import urlparse
+import logging
 import duckdb
 
 try:
@@ -15,6 +16,9 @@ try:
 except ImportError:
     requests = None
     BeautifulSoup = None
+
+# Set up logger for this module
+logger = logging.getLogger(__name__)
 
 
 def scrape_url(url: str, timeout: int = 10) -> Dict[str, Any]:
@@ -42,8 +46,8 @@ def scrape_url(url: str, timeout: int = 10) -> Dict[str, Any]:
         ...     print(data["raw_text"])
     """
     if requests is None or BeautifulSoup is None:
-        print(
-            "Warning: requests and beautifulsoup4 not available. "
+        logger.warning(
+            "requests and beautifulsoup4 not available. "
             "Install with: pip install requests beautifulsoup4"
         )
         return {
@@ -99,7 +103,7 @@ def scrape_url(url: str, timeout: int = 10) -> Dict[str, Any]:
         }
 
     except requests.exceptions.RequestException as e:
-        print(f"Error scraping {url}: {e}")
+        logger.error(f"Error scraping {url}: {e}")
         return {
             "url": url,
             "domain": domain,
@@ -193,15 +197,20 @@ def rewrite_summary(raw_text: str, max_length: int = 500) -> str:
     summary = raw_text[:max_length]
 
     # Try to find the last period, exclamation, or question mark
-    last_sentence_end = max(
-        summary.rfind(". "), summary.rfind("! "), summary.rfind("? ")
-    )
+    sentence_endings = [
+        summary.rfind(". "),
+        summary.rfind("! "),
+        summary.rfind("? "),
+    ]
+    last_sentence_end = max(sentence_endings)
 
+    # Check if we found a sentence ending (rfind returns -1 if not found)
     if last_sentence_end > max_length // 2:
         # Found a sentence boundary in the latter half
         return summary[: last_sentence_end + 1].strip()
     else:
         # No good sentence boundary, just add ellipsis
+        # Avoid breaking in the middle of a word
         return summary.rsplit(" ", 1)[0].strip() + "..."
 
 
