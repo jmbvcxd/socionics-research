@@ -401,19 +401,25 @@ def scrape_with_fallback(
     from .sociotype_scraper import SociotypeXyzScraper
 
     used_playwright = False
-    celebrities: List[Dict[str, Any]] = []
 
     # Try HTTP scraper first
     print("Attempting HTTP scraping...")
-    http_scraper = SociotypeXyzScraper()
+    try:
+        http_scraper = SociotypeXyzScraper()
+    except ImportError as e:
+        print(f"HTTP scraper not available: {e}")
+        http_scraper = None
 
-    if person_name:
-        celebrities = http_scraper.scrape_celebrities()
-        celebrities = [
-            c for c in celebrities if person_name.lower() in c["name"].lower()
-        ]
+    if http_scraper:
+        if person_name:
+            celebrities = http_scraper.scrape_celebrities()
+            celebrities = [
+                c for c in celebrities if person_name.lower() in c["name"].lower()
+            ]
+        else:
+            celebrities = http_scraper.scrape_celebrities(limit=limit)
     else:
-        celebrities = http_scraper.scrape_celebrities(limit=limit)
+        celebrities: List[Dict[str, Any]] = []
 
     # If HTTP scraping failed or found nothing, try Playwright
     if not celebrities:
