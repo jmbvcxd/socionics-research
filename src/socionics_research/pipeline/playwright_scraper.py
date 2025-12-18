@@ -452,8 +452,11 @@ def scrape_with_fallback(
     if used_playwright:
         with PlaywrightSociotypeScraper() as pw_scraper:
             saved_count = pw_scraper.save_to_database(conn, celebrities)
-    else:
+    elif http_scraper:
         saved_count = http_scraper.save_to_database(conn, celebrities)
+    else:
+        conn.close()
+        return 0
 
     conn.close()
     return saved_count

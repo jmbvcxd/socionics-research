@@ -30,7 +30,7 @@ def test_scrape_with_fallback_uses_playwright_when_http_returns_none(monkeypatch
                 {
                     "name": "Playwright Person",
                     "sociotype": "ILE",
-                    "url": "example",
+                    "url": "https://example.com",
                     "confidence": 0.9,
                 }
             ]
