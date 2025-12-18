@@ -446,18 +446,9 @@ def scrape_with_fallback(
             print(f"Playwright scraping error: {e}")
             return 0
 
-    if not celebrities:
-        print("No celebrities found with either method.")
-        return 0
-
-    # Save to database
+    # Save to database (HTTP path)
     conn = get_connection(db_path, read_only=False)
-
-    if http_scraper:
-        saved_count = http_scraper.save_to_database(conn, celebrities)
-    else:
-        conn.close()
-        return 0
+    saved_count = http_scraper.save_to_database(conn, celebrities)
 
     conn.close()
     return saved_count
