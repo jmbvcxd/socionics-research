@@ -86,3 +86,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Clear provenance tracking for all data sources
 - Explicit consent required for user personality analysis
 - Transparent methodology and open documentation
+
+## Recent Changes
+
+- 2025-12-18: Enhanced fallback scraping to ensure Playwright saves sociotype.xyz results when the primary HTTP scraper returns no data, improving import reliability. Tests: `pytest -q` (includes `tests/test_scrape_with_fallback.py`)
