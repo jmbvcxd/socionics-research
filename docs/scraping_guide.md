@@ -11,6 +11,13 @@ The scraping system uses a **two-tier approach** for maximum reliability:
 
 When data cannot be found with the HTTP scraper, the system automatically falls back to Playwright.
 
+### Available Scrapers
+
+- **`scrape_url()`** in `pipeline/scraper.py`: General-purpose HTTP scraper for any URL
+- **`SociotypeXyzScraper`**: Specialized scraper for sociotype.xyz using HTTP
+- **`PlaywrightSociotypeScraper`**: Browser-based scraper for JavaScript-heavy sites
+- **`scrape_with_fallback()`**: Smart function that tries HTTP first, then Playwright
+
 ## Installation
 
 ### Basic Setup

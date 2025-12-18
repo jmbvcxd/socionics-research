@@ -43,6 +43,12 @@ class LLMClient:
     ) -> Dict[str, Any]:
         """Run a prompt and capture the response.
 
+        NOTE: This is an abstract base implementation that returns placeholder data.
+        For production use, create a subclass that implements actual LLM API calls:
+        - OpenAIClient for OpenAI/GPT models
+        - AnthropicClient for Claude models
+        - LocalLLMClient for local models (llama.cpp, ollama, etc.)
+
         Args:
             prompt: The prompt text
             system_personality: Personality directives to inject
@@ -55,17 +61,34 @@ class LLMClient:
             - response_text: Generated text
             - tokens: List of token information (if capture_logprobs=True)
             - metadata: Additional metadata
+
+        Example:
+            To implement a real LLM client:
+            >>> class OpenAIClient(LLMClient):
+            ...     def __init__(self, model_name, api_key):
+            ...         super().__init__(model_name, "1.0")
+            ...         self.api_key = api_key
+            ...
+            ...     def run_prompt(self, prompt, **kwargs):
+            ...         # Call OpenAI API here
+            ...         response = openai.ChatCompletion.create(...)
+            ...         return {"response_text": response.text, ...}
         """
-        # Placeholder implementation
-        # In production, call actual API and capture logprobs
+        # Base implementation returns placeholder data
+        # Subclasses should override this method with actual API calls
         return {
-            "response_text": "This is a placeholder response.",
+            "response_text": (
+                "This is a placeholder response from the base LLMClient. "
+                "Create a subclass (e.g., OpenAIClient, AnthropicClient) "
+                "and implement run_prompt() to call actual LLM APIs."
+            ),
             "tokens": [],
             "metadata": {
                 "model_name": self.model_name,
                 "model_version": self.model_version,
                 "temperature": temperature,
                 "system_personality": system_personality,
+                "is_placeholder": True,
             },
         }
 
