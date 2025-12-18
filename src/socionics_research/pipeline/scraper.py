@@ -9,18 +9,23 @@ from typing import Optional, Dict, Any
 from urllib.parse import urlparse
 import duckdb
 
+try:
+    import requests
+    from bs4 import BeautifulSoup
+except ImportError:
+    requests = None
+    BeautifulSoup = None
 
-def scrape_url(url: str) -> Dict[str, Any]:
-    """Scrape content from a URL.
 
-    This is a placeholder implementation. In production, you should:
-    - Respect robots.txt
-    - Add proper error handling
-    - Implement rate limiting
-    - Use a proper HTTP client library (e.g., requests, httpx)
+def scrape_url(url: str, timeout: int = 10) -> Dict[str, Any]:
+    """Scrape content from a URL using HTTP requests.
+
+    This implementation uses requests + BeautifulSoup for HTTP-based scraping.
+    For JavaScript-heavy sites, consider using the Playwright scraper instead.
 
     Args:
         url: The URL to scrape
+        timeout: Request timeout in seconds (default: 10)
 
     Returns:
         Dictionary containing scraped data with keys:
@@ -29,22 +34,81 @@ def scrape_url(url: str) -> Dict[str, Any]:
         - raw_text: Scraped text content
         - scrape_date: Timestamp of scraping
         - license_note: Any license information found
+        - success: Whether scraping succeeded
 
     Example:
         >>> data = scrape_url("https://example.com/bio")
-        >>> print(data["raw_text"])
+        >>> if data["success"]:
+        ...     print(data["raw_text"])
     """
-    # Placeholder implementation
+    if requests is None or BeautifulSoup is None:
+        print(
+            "Warning: requests and beautifulsoup4 not available. "
+            "Install with: pip install requests beautifulsoup4"
+        )
+        return {
+            "url": url,
+            "domain": urlparse(url).netloc,
+            "raw_text": "",
+            "scrape_date": datetime.now(),
+            "license_note": "Public domain or fair use",
+            "success": False,
+            "error": "Required libraries not installed",
+        }
+
     parsed = urlparse(url)
     domain = parsed.netloc
 
-    return {
-        "url": url,
-        "domain": domain,
-        "raw_text": "",  # TODO: Implement actual scraping
-        "scrape_date": datetime.now(),
-        "license_note": "Public domain or fair use",
-    }
+    try:
+        # Make HTTP request with timeout
+        response = requests.get(
+            url,
+            timeout=timeout,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (compatible; SocionicsResearch/0.1; "
+                    "+https://github.com/jmbvcxd/socionics-research)"
+                )
+            },
+        )
+        response.raise_for_status()
+
+        # Parse HTML and extract text content
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Remove script and style elements
+        for script in soup(["script", "style"]):
+            script.decompose()
+
+        # Get text content
+        raw_text = soup.get_text(separator="\n", strip=True)
+
+        # Try to find license information
+        license_note = "Public domain or fair use"
+        license_elem = soup.find(["meta", "div", "span"], attrs={"name": "license"})
+        if license_elem:
+            license_note = license_elem.get("content", license_note)
+
+        return {
+            "url": url,
+            "domain": domain,
+            "raw_text": raw_text,
+            "scrape_date": datetime.now(),
+            "license_note": license_note,
+            "success": True,
+        }
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error scraping {url}: {e}")
+        return {
+            "url": url,
+            "domain": domain,
+            "raw_text": "",
+            "scrape_date": datetime.now(),
+            "license_note": "Public domain or fair use",
+            "success": False,
+            "error": str(e),
+        }
 
 
 def save_source(
@@ -104,10 +168,9 @@ def save_source(
 def rewrite_summary(raw_text: str, max_length: int = 500) -> str:
     """Generate a concise summary for RAG indexing.
 
-    This is a placeholder. In production, you should use:
-    - An LLM for summarization
-    - Extractive summarization algorithms
-    - Domain-specific extraction
+    This uses a simple extractive approach, taking the first meaningful
+    paragraphs. For production use with LLMs, consider using the LLMClient
+    for abstractive summarization.
 
     Args:
         raw_text: Original text
@@ -115,12 +178,31 @@ def rewrite_summary(raw_text: str, max_length: int = 500) -> str:
 
     Returns:
         Summarized text
+
+    Note:
+        For advanced summarization with LLMs, use:
+        >>> from socionics_research.llm import LLMClient
+        >>> client = LLMClient("gpt-4", "1.0")
+        >>> result = client.run_prompt(f"Summarize: {raw_text}")
     """
-    # Simple placeholder: take first max_length characters
-    if len(raw_text) <= max_length:
+    if not raw_text or len(raw_text) <= max_length:
         return raw_text
 
-    return raw_text[:max_length] + "..."
+    # Simple extractive summarization: take first max_length characters
+    # Try to break at sentence boundary if possible
+    summary = raw_text[:max_length]
+
+    # Try to find the last period, exclamation, or question mark
+    last_sentence_end = max(
+        summary.rfind(". "), summary.rfind("! "), summary.rfind("? ")
+    )
+
+    if last_sentence_end > max_length // 2:
+        # Found a sentence boundary in the latter half
+        return summary[: last_sentence_end + 1].strip()
+    else:
+        # No good sentence boundary, just add ellipsis
+        return summary.rsplit(" ", 1)[0].strip() + "..."
 
 
 def update_source_summary(
